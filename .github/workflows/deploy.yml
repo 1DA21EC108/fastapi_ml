@@ -16,6 +16,13 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
 
+    - name: Debug Secret
+      run: |
+        echo "Length of AZURE_CREDENTIALS: ${#AZURE_CREDENTIALS}"
+      env:
+        AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
+
+
     - name: Log in to Azure
       uses: azure/login@v1
       with:
