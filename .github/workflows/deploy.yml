@@ -3,12 +3,14 @@ name: Deploy FastAPI to Azure Container App
 on:
   push:
     branches:
-      - main  # Change to your deployment branch
+      - main
+
+permissions:
+  contents: read
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-    environment: production
 
     steps:
     - name: Checkout code
@@ -19,13 +21,10 @@ jobs:
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-
-    - name: Build and push Docker image to ACR
+    - name: Log in to ACR
       uses: azure/docker-login@v1
       with:
         login-server: ${{ secrets.AZURE_CONTAINER_REGISTRY }}
-        username: ${{ secrets.AZURE_CLIENT_ID }}
-        password: ${{ secrets.AZURE_CLIENT_SECRET }}
 
     - name: Build and push image
       run: |
@@ -38,5 +37,4 @@ jobs:
         az containerapp update \
           --name ${{ secrets.AZURE_CONTAINER_APP_NAME }} \
           --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
-          --image ${{ secrets.AZURE_CONTAINER_REGISTRY }}/fastapi-app:${{ github.sha }} \
-          --query configuration.ingress.fqdn
+          --image ${{ secrets.AZURE_CONTAINER_REGISTRY }}/fastapi-app:${{ github.sha }}
